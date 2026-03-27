@@ -1,0 +1,20 @@
+# dy-moviegen-v2 依赖
+
+# 核心依赖
+websockets>=12.0
+requests>=2.31.0
+pillow>=10.0.0
+
+# 视频处理
+ffmpeg-python>=0.2.0
+
+# Playwright 自动化（剪映模式）
+playwright>=1.40.0
+
+# LLM 调用（Agent 协作）
+openai>=1.0.0
+
+# 工具库
+pyperclip>=1.8.2
+aiohttp>=3.9.0
+python-dotenv>=1.0.0

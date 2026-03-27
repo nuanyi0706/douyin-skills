@@ -1,0 +1,26 @@
+[project]
+name = "douyin-skills"
+version = "0.1.0"
+description = "抖音自动化 Skills，基于 Python CDP 浏览器自动化引擎"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "websockets>=12.0",
+    "requests>=2.31.0",
+    "pillow>=10.0.0",
+    "pyperclip>=1.8.2",
+]
+
+[project.scripts]
+douyin-cli = "scripts.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
