@@ -1,6 +1,6 @@
 # 抖音一站式运营 Skills
 
-基于 Python CDP 浏览器自动化引擎 + AI 视频生成，支持 OpenClaw 及所有兼容 SKILL.md 格式的 AI Agent 平台。
+基于 Python CDP 浏览器自动化引擎 + AI 短漫剧生成，支持 OpenClaw 及所有兼容 SKILL.md 格式的 AI Agent 平台。
 
 ## 🎯 核心能力
 
@@ -10,7 +10,7 @@
 | **dy-publish** | 内容发布：视频发布、图文发布、定时发布 | ✅ |
 | **dy-explore** | 内容发现：关键词搜索、视频详情、用户主页、推荐流 | ✅ |
 | **dy-interact** | 社交互动：点赞、收藏、评论、关注 | ✅ |
-| **dy-moviegen-v2** | **AI 短剧生成：剧本创作 + 图像生成 + 视频生成** ✨ | ✅ v10 |
+| **manjv** | **AI 短漫剧：LumenX架构、剧本分析、资产生成、分镜绘制、视频合成** ✨ | ✅ |
 
 ---
 
@@ -19,7 +19,7 @@
 - Python >= 3.11
 - uv 包管理器（推荐）或 pip
 - Google Chrome 浏览器
-- ffmpeg（视频生成需要）
+- ffmpeg（视频处理需要）
 
 ---
 
@@ -31,12 +31,9 @@ cd ~/.openclaw/workspace/skills/douyin-skills
 # 安装主依赖
 uv sync
 
-# 安装 dy-moviegen-v2 依赖（AI 视频生成）
-cd skills/dy-moviegen-v2
+# 安装 manjv 依赖（AI 短漫剧生成）
+cd skills/manjv
 pip install -r requirements.txt
-
-# 安装 Playwright（剪映自动化模式需要）
-playwright install chromium
 ```
 
 ---
@@ -62,81 +59,112 @@ playwright install chromium
 **内容发布：**
 - "帮我发布一条视频，标题是…"
 
-**AI 短剧生成：**
-- "帮我写一个古风重生权谋短剧，女主是将军之女"
-- "生成角色三视图"
-- "生成九宫格分镜"
-- "用 Grok 生成一个仙侠战斗视频"
+**AI 短漫剧生成：**
+- "分析这个小说片段，提取角色和场景"
+- "生成角色三视图：古风少女，白衣汉服"
+- "生成场景鸟瞰图"
+- "生成9宫格分镜"
+- "将分镜图转换为视频"
+- "拼接所有视频片段"
 
 ---
 
-## 🎬 dy-moviegen-v2 - AI 短剧生成 Agent
+## 🎬 manjv - AI 短漫剧一站式生产平台
 
-增强版多 Agent 协作短剧自动生成工具，整合 **Grok Imagine API** + **Nano Banana 2 (Kie AI)** + **剪映自动化**。
+基于 LumenX Studio 架构设计，整合 **Nano Banana 2** (图像生成) + **Grok** (视频生成)，实现从小说文本到动态视频的完整创作链路。
 
-### 核心能力
+### 完整创作链路
 
-| 功能模块 | 说明 |
-|---------|------|
-| 🎬 导演统筹 | 自动规划整体节奏和分段 |
-| ✍️ 编剧创作 | 根据剧情生成脚本和台词 |
-| 🎥 分镜设计 | 专业分镜提示词，时间轴精确控制 |
-| 📝 提示词编译 | 264 标签库，专业提示词生成 |
-| 🤖 视频生成 | Grok Imagine API + 剪映自动化 |
-| 🖼️ 图像生成 | Nano Banana 2 (Gemini 3.1 Flash) |
+```
+故事素材 → 剧本分析 → 实体提取 → 风格定调 → 资产生成 → 分镜绘制 → 视频合成 → 成片装配
+```
+
+### 六大核心模块
+
+| 模块 | 功能 | 触发词 |
+|------|------|--------|
+| 剧本分析 | 提取角色、场景、道具、冲突点 | 分析剧本、拆解剧情 |
+| 风格定调 | 定义视觉风格、统一画面标准 | 风格设定、视觉风格 |
+| 资产生成 | 角色三视图、场景图、道具图 | 生成角色图、三视图 |
+| 分镜绘制 | 9宫格/3宫格分镜故事板 | 生成分镜、9宫格 |
+| 视频合成 | I2V/T2V 动态视频生成 | 生成视频、I2V |
+| 成片装配 | ffmpeg 拼接最终短剧 | 拼接视频、导出 |
+
+### 技术能力
+
+| 功能 | 说明 |
+|------|------|
 | 👤 角色三视图 | 上半身/正面全身/背面全身 |
-| 📐 九宫格分镜 | 3×3 完整故事板 |
-| 🏞️ 场景资产 | 鸟瞰图、全景图 |
-| ✂️ 剪辑装配 | ffmpeg 拼接成片 |
+| 🏞️ 场景鸟瞰图 | 超远距离俯视视角 |
+| 🌐 场景全景图 | 210度超广角 |
+| 🎭 道具白底图 | 主体提取 |
+| 📐 九宫格分镜 | 3x3 完整故事板 |
+| 📊 三宫格分镜 | 3格精简版 |
+| 🔍 图像放大 | 超高清 4K |
+| 🎥 I2V 视频 | 图生视频 |
+| 🎬 T2V 视频 | 文生视频 |
+| ✂️ ffmpeg 装配 | 多段拼接 |
 
 ### 平台支持
 
-| 平台 | 功能 | 模式 |
+| 平台 | 模式 | 用途 |
 |------|------|------|
-| **Grok Imagine** | 视频生成 (T2V/I2V) | API 直连 |
-| **Nano Banana 2** | 图像生成、三视图、九宫格 | API 直连 |
-| **剪映** | 视频生成/编辑 | Playwright 自动化 |
+| **Nano Banana 2** | API 直连 | 图像生成（角色/场景/道具/分镜） |
+| **Grok Imagine** | API 直连 | 视频生成（I2V/T2V） |
+| **ffmpeg** | 本地 | 视频拼接与后期处理 |
 
 ### 快速开始
 
 ```bash
-cd skills/dy-moviegen-v2
+cd skills/manjv
 
 # 设置 API Key
 export KIE_API_KEY="your-api-key"
 
-# 图像生成
-python3 scripts/nano_banana_api.py generate \
-  --prompt "古风少女，仙气飘飘，手持玉笛" \
-  --aspect-ratio 3:4 \
+# 剧本分析
+python3 main.py analyze --script "小说文本..."
+
+# 资产生成 - 角色三视图
+python3 scripts/workflow.py generate-asset \
+  --type character-tri-view \
+  --description "古风少女，身穿白色汉服" \
   --resolution 2K
 
-# 角色三视图
-python3 scripts/unified_workflow.py tri-view \
-  --description "古风少女，身穿白色汉服，手持玉笛"
+# 资产生成 - 场景鸟瞰图
+python3 scripts/workflow.py generate-asset \
+  --type scene-bird-view \
+  --image scene.png \
+  --resolution 4K
 
-# 九宫格分镜
-python3 scripts/unified_workflow.py 9grid \
-  --content "九宫格分镜内容..." \
-  --images 场景.png 角色1.png 角色2.png
+# 分镜生成 - 9宫格
+python3 scripts/workflow.py generate-storyboard \
+  --type 9grid \
+  --content "分镜内容描述..." \
+  --resolution 4K
 
-# 视频生成 (Grok)
-python3 scripts/grok_api.py \
-  --prompt "A cyberpunk city with neon lights" \
-  --duration 10 \
-  --ratio 9:16
+# 视频生成 - I2V
+python3 scripts/workflow.py generate-video \
+  --mode i2v \
+  --images frame1.png frame2.png \
+  --prompt "镜头推进，人物走向前方" \
+  --duration 10
+
+# 视频装配
+python3 scripts/workflow.py assemble \
+  --clips video1.mp4 video2.mp4 video3.mp4 \
+  --output final_drama.mp4
 ```
 
 ### 工作流文档
 
 | 文档 | 说明 |
 |------|------|
-| `script-creation-workflow.md` | 短剧剧本创作提示词（状态机版） |
-| `story-to-execution.md` | AI短视频故事生成模板 v2.0 |
-| `image-prompt-generator.md` | 万能图像提示词生成器（264标签） |
-| `character-design-template.md` | 角色设定提示词模板 |
-| `asset-prompts.md` | 资产库提示词（鸟瞰图/全景图/三视图） |
-| `platform-specs.md` | 平台规格（Grok + Nano Banana 2） |
+| `script-analysis-workflow.md` | 剧本分析流程 |
+| `art-direction-workflow.md` | 风格定调流程 |
+| `assets-generation-workflow.md` | 资产生成流程 |
+| `storyboard-workflow.md` | 分镜绘制流程 |
+| `motion-workflow.md` | 视频合成流程 |
+| `assembly-workflow.md` | 成片装配流程 |
 
 ---
 
@@ -153,19 +181,22 @@ douyin-skills/
 │   ├── dy-publish/             # 内容发布
 │   ├── dy-explore/             # 内容发现
 │   ├── dy-interact/            # 社交互动
-│   └── dy-moviegen-v2/         # AI 短剧生成 ✨
+│   └── manjv/                  # AI 短漫剧生成 ✨
 │       ├── SKILL.md
 │       ├── main.py
-│       ├── scripts/            # API 客户端
-│       │   ├── grok_api.py
-│       │   ├── nano_banana_api.py
-│       │   └── unified_workflow.py
-│       └── references/         # 工作流文档
-│           ├── script-creation-workflow.md
-│           ├── story-to-execution.md
-│           ├── image-prompt-generator.md
-│           ├── character-design-template.md
-│           └── ...
+│       ├── requirements.txt
+│       ├── scripts/
+│       │   ├── nanobanana_api.py    # Nano Banana 2 API
+│       │   ├── grok_api.py          # Grok Imagine API
+│       │   ├── video_assembler.py   # ffmpeg 装配
+│       │   └── workflow.py          # 工作流
+│       └── references/              # 工作流文档
+│           ├── script-analysis-workflow.md
+│           ├── art-direction-workflow.md
+│           ├── assets-generation-workflow.md
+│           ├── storyboard-workflow.md
+│           ├── motion-workflow.md
+│           └── assembly-workflow.md
 │
 └── scripts/                    # Python 自动化引擎
     ├── cli.py
@@ -223,20 +254,24 @@ python scripts/cli.py publish-video \
 
 ## ⚠️ 注意事项
 
-1. **API Key** - Grok 和 Nano Banana 2 需要 Kie AI API Key
+1. **API Key** - Nano Banana 2 和 Grok 需要 Kie AI API Key
+   - 获取地址：https://kie.ai/api-key
 2. **登录状态** - 部分功能需要登录后才能使用
 3. **选择器更新** - 抖音页面结构可能变化，选择器需要定期更新
-4. **九宫格生成** - 耗时较长，建议设置足够的 timeout
 
 ---
 
 ## 🔄 更新日志
 
+### 2026-03-31 - v2.0.0
+- 🔥 **重大更新**：新增 **manjv** AI 短漫剧生成模块
+- ✨ 基于 LumenX Studio 架构设计
+- ✨ 整合 Nano Banana 2 + Grok 实现完整创作链路
+- 🗑️ 移除 dy-moviegen-v2（已迁移到 manjv）
+
 ### 2026-03-27 - v10.0
 - 🔥 重构图像生成：使用 Nano Banana 2 (Kie AI API)
 - ✨ 新增功能：角色三视图、九宫格分镜、场景鸟瞰图/全景图
-- 📚 更新工作流文档：剧本创作、故事生成、角色设定、资产库提示词
-- 🗑️ 移除 Seedance 2.0，统一使用 Grok + Nano Banana 2
 
 ### 2026-03-19 - v2.0
 - ✨ 新增 dy-moviegen-v2 增强版短剧生成技能
@@ -249,9 +284,9 @@ python scripts/cli.py publish-video \
 ## 🔗 相关资源
 
 - **Kie AI**: https://kie.ai
+- **LumenX Studio**: https://github.com/alibaba/lumenx
 - **抖音主站**: https://www.douyin.com
 - **创作者中心**: https://creator.douyin.com
-- **剪映**: https://xyq.jianying.com
 
 ---
 
