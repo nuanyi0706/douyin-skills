@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Grok Imagine API 客户端
 支持：T2V 文生视频 / I2V 图生视频 / 视频扩展
@@ -74,9 +75,7 @@ class GrokClient:
                 data = result.get("data", {})
                 state = data.get("state", "")
                 
-                # 状态映射（根据文档）
-                # waiting: 已排队 | queuing: 队列中 | generating: 处理中
-                # success: 成功 | fail: 失败
+                # 状态映射
                 status_map = {
                     "waiting": "processing",
                     "queuing": "processing",
@@ -93,20 +92,16 @@ class GrokClient:
                 if result_json_str and state == "success":
                     try:
                         result_data = json.loads(result_json_str)
-                        # 图像/媒体/视频格式: {resultUrls: []}
-                        # 文本格式: {resultObject: {}}
                         result_urls = result_data.get("resultUrls", [])
                         if result_urls:
                             result_url = result_urls[0]
                         else:
-                            # 尝试其他可能的字段
                             result_url = (
                                 result_data.get("video_url") or
                                 result_data.get("result_url") or
                                 result_data.get("url")
                             )
                     except json.JSONDecodeError:
-                        # URL encoded 情况
                         try:
                             from urllib.parse import unquote
                             decoded = unquote(result_json_str)
@@ -149,21 +144,17 @@ class GrokClient:
         文生视频 (T2V)
         
         Args:
-            prompt: 视频描述提示词（最大 5000 字符，支持英文）
-            aspect_ratio: 画面比例 
-                         - "2:3"(竖向), "3:2"(横向), "1:1"(正方形), "16:9"(宽屏), "9:16"(竖屏)
-            mode: 生成模式 
-                  - "fun": 更有创意和趣味的解读
-                  - "normal": 平衡方法，具有良好的运动质量
-                  - "spicy": 更有活力和强烈的运动效果
+            prompt: 视频描述提示词
+            aspect_ratio: 画面比例
+            mode: 生成模式 (fun/normal/spicy)
             duration: 时长 "6" 或 "10" 秒
             resolution: 分辨率 "480p" 或 "720p"
-            callback_url: 任务完成回调 URL
+            callback_url: 回调 URL
             wait: 是否等待完成
             max_wait_seconds: 最大等待秒数
         
         Returns:
-            dict: {"status": "success", "task_id": str, ...}
+            dict: 生成结果
         """
         payload = {
             "model": "grok-imagine/text-to-video",
@@ -209,26 +200,20 @@ class GrokClient:
         图生视频 (I2V)
         
         Args:
-            prompt: 视频描述提示词（可选，最大5000字符，支持英文）
-            image_urls: 图片 URL 列表（最多 7 张），不能与 task_id 同时使用
-                        支持 JPEG、PNG、WEBP 格式，每张最大 10MB
-            task_id: 之前生成的 Grok 图像任务 ID（不能与 image_urls 同时使用）
-            index: 使用 task_id 时指定图像索引 (0-5)，默认 0
-            mode: 生成模式 
-                  - "fun": 更有创意和趣味的解读
-                  - "normal": 平衡方法，具有良好的运动质量
-                  - "spicy": 更有活力和强烈的运动效果（外部图片不可用）
-            duration: 时长 "6" 或 "10" 秒，默认 "6"
-            resolution: 分辨率 "480p" 或 "720p"，默认 "480p"
-            aspect_ratio: 画面比例（仅多图模式适用）
-                         - "2:3", "3:2", "1:1", "16:9", "9:16"
-                         - 单图模式下视频宽高参考图片宽高
-            callback_url: 任务完成回调 URL
+            prompt: 视频描述提示词
+            image_urls: 图片 URL 列表（最多 7 张）
+            task_id: 之前生成的图像任务 ID
+            index: 使用 task_id 时指定图像索引
+            mode: 生成模式
+            duration: 时长
+            resolution: 分辨率
+            aspect_ratio: 画面比例（多图模式）
+            callback_url: 回调 URL
             wait: 是否等待完成
             max_wait_seconds: 最大等待秒数
         
         Returns:
-            dict: {"status": "success", "task_id": str, ...}
+            dict: 生成结果
         """
         input_data = {
             "mode": mode,
@@ -240,11 +225,9 @@ class GrokClient:
             input_data["prompt"] = prompt
         
         if image_urls:
-            input_data["image_urls"] = image_urls[:7]  # 最多 7 张
-            # 多图模式添加 aspect_ratio
+            input_data["image_urls"] = image_urls[:7]
             if len(image_urls) > 1:
                 input_data["aspect_ratio"] = aspect_ratio
-            # 外部图片不支持 spicy 模式
             if mode == "spicy":
                 input_data["mode"] = "normal"
         elif task_id:
@@ -286,28 +269,18 @@ class GrokClient:
         """
         扩展视频
         
-        基于之前生成的视频任务进行扩展延长。只能扩展由 Kie AI 模型生成的视频。
-        
         Args:
-            task_id: 之前成功的视频生成任务 ID（必须来自 Kie AI 视频生成模型）
-                     支持 grok-imagine/text-to-video 或 grok-imagine/image-to-video 生成的任务
-            prompt: 描述视频如何扩展的提示词（必填，支持中英文）
-                    可指定镜头运动、场景变化、物体动作等
-            extend_at: 扩展起点位置（默认 0，从视频开头扩展）
-            extend_times: 扩展时长 "6" 或 "10" 秒（默认 "10"）
-            callback_url: 任务完成回调 URL
+            task_id: 之前成功的视频生成任务 ID
+            prompt: 描述视频如何扩展的提示词
+            extend_at: 扩展起点位置
+            extend_times: 扩展时长 "6" 或 "10"
+            callback_url: 回调 URL
             wait: 是否等待完成
             max_wait_seconds: 最大等待秒数
         
         Returns:
-            dict: {"status": "success", "task_id": str, ...}
-        
-        注意:
-            - 只能扩展由 Kie AI 生成的视频，不支持外部视频
-            - 原始视频生成必须成功完成
-            - 扩展时长越长，生成所需时间相应增加
+            dict: 生成结果
         """
-        # 参数验证
         if not task_id:
             return {"status": "failed", "error": "task_id 是必填字段"}
         if not prompt:
@@ -379,11 +352,6 @@ class GrokClient:
     ) -> Dict[str, Any]:
         """
         等待任务完成
-        
-        轮询最佳实践：
-        - 初始轮询（前30秒）: 每2-3秒
-        - 30秒后: 每5-10秒
-        - 2分钟后: 每15-30秒
         """
         print(f"⏳ 等待生成完成... (Task ID: {task_id})")
         
@@ -402,7 +370,6 @@ class GrokClient:
                 result_urls = status.get("result_urls", [])
                 
                 if result_urls and len(result_urls) > 0:
-                    # 下载第一个视频
                     output_path = await self._download_video(result_urls[0], task_id)
                     return {
                         "status": "success",
@@ -438,7 +405,6 @@ class GrokClient:
                     "task_id": task_id
                 }
             
-            # 显示进度
             progress = status.get("progress", 0)
             if progress > 0:
                 print(f"  ⏳ 进度：{progress}%")
@@ -484,15 +450,14 @@ class GrokClient:
             return None
 
 
-# CLI 入口
 async def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Grok Imagine API 客户端")
     parser.add_argument("--prompt", "-p", type=str, default=None, help="视频描述提示词")
     parser.add_argument("--mode", "-m", type=str, choices=["t2v", "i2v", "extend"], default="t2v", help="生成模式")
-    parser.add_argument("--image", "-i", type=str, nargs="+", default=None, help="参考图片 URL（I2V 模式，最多 7 张）")
-    parser.add_argument("--task-id", "-t", type=str, default=None, help="任务 ID（extend 模式或 I2V 使用 Grok 图像）")
+    parser.add_argument("--image", "-i", type=str, nargs="+", default=None, help="参考图片 URL（I2V 模式）")
+    parser.add_argument("--task-id", "-t", type=str, default=None, help="任务 ID")
     parser.add_argument("--duration", "-d", type=str, choices=["6", "10"], default="10", help="时长（秒）")
     parser.add_argument("--ratio", "-r", type=str, 
                        choices=["2:3", "3:2", "1:1", "16:9", "9:16"], 
@@ -501,9 +466,6 @@ async def main():
                        choices=["fun", "normal", "spicy"], 
                        default="normal", help="生成风格")
     parser.add_argument("--resolution", type=str, choices=["480p", "720p"], default="720p", help="分辨率")
-    parser.add_argument("--aspect-ratio", type=str,
-                       choices=["2:3", "3:2", "1:1", "16:9", "9:16"],
-                       default="9:16", help="画面比例（I2V多图模式）")
     parser.add_argument("--no-wait", action="store_true", help="不等待完成")
     parser.add_argument("--query", "-q", type=str, default=None, help="查询任务状态")
     
@@ -511,7 +473,6 @@ async def main():
     
     client = GrokClient()
     
-    # 查询模式
     if args.query:
         result = await client.get_task_status(args.query)
         print("\n📊 任务状态：")
@@ -534,7 +495,6 @@ async def main():
             print(f"  错误码：{result.get('fail_code')}")
         return
     
-    # 生成模式
     if not args.prompt and args.mode != "i2v":
         parser.error("--prompt is required for video generation")
     
@@ -550,7 +510,6 @@ async def main():
             mode=args.style,
             duration=args.duration,
             resolution=args.resolution,
-            aspect_ratio=args.aspect_ratio,
             wait=not args.no_wait
         )
     elif args.mode == "extend":

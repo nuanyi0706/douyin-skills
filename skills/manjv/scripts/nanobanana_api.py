@@ -8,8 +8,6 @@ Nano Banana 2 API Client - Kie AI Image Generation
 - 多种画幅比例和分辨率
 
 API 文档: https://api.kie.ai/api/v1/jobs/createTask
-
-Author: Work-Fisher
 """
 
 import argparse
@@ -99,7 +97,7 @@ class NanoBananaClient:
         
         Args:
             prompt: 提示词（最大 20000 字符）
-            aspect_ratio: 画幅比例 (auto/1:1/16:9/9:16/4:3/3:4/21:9/2:3/3:2/1:4/4:1/1:8/8:1/4:5/5:4)
+            aspect_ratio: 画幅比例
             resolution: 分辨率 (1K/2K/4K)
             output_format: 输出格式 (jpg/png)
             image_input: 图生图的输入图片URL列表（最多 14 张）
@@ -320,44 +318,6 @@ class NanoBananaClient:
             print(f"下载失败: {e}")
             return False
 
-
-# ============================================================
-# 便捷函数
-# ============================================================
-
-def generate_image(
-    prompt: str,
-    aspect_ratio: str = "auto",
-    resolution: str = "1K",
-    image_input: Optional[List[str]] = None,
-    api_key: Optional[str] = None
-) -> Optional[str]:
-    """
-    快速生成单张图像
-    
-    Args:
-        prompt: 提示词
-        aspect_ratio: 画幅比例
-        resolution: 分辨率
-        image_input: 参考图片列表
-        api_key: API密钥
-    
-    Returns:
-        图像URL或None
-    """
-    client = NanoBananaClient(api_key)
-    result = client.generate(
-        prompt=prompt,
-        aspect_ratio=aspect_ratio,
-        resolution=resolution,
-        image_input=image_input
-    )
-    return result.image_url
-
-
-# ============================================================
-# CLI 入口
-# ============================================================
 
 def main():
     parser = argparse.ArgumentParser(description="Nano Banana 2 图像生成 API 客户端 (Kie AI)")
